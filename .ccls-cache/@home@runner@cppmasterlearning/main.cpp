@@ -38,6 +38,31 @@ void assignAge(int* age){
   *age = 23;
 }
 
+// different from a class, struct are default at public
+// we can still make a private attribute in struct like a class
+struct sShape{
+  double length, width;
+  sShape(double l=1,double w=1){
+    length = l;
+    width = w;
+  }
+
+  double area(){
+    return length * width;
+  }
+
+};
+
+// struct are also able to inherit each other
+struct sCircle: sShape{
+  sCircle(double r=1):sShape(r){
+    this->width = r;
+  }
+  double Area(){
+    return PI * this->width * this->width;
+  }
+};
+
 int main() {
   cout << "Hello World!"<<endl;
   cout << "\n---BASIC TYPES---\n"<<endl;
@@ -378,6 +403,13 @@ int main() {
 
   // struct is a data type that can be used to group related variables into one place
   // struct is used to create a new data type
+  sShape sph1(10,10);
+  cout<<sph1.area()<<endl;
+  sCircle scor(5);
+  cout<<scor.area()<<endl;
+
+  cout<<"\n---OPERATOR OVERLOAD---\n"<<endl;
+  
 
   return 0;
 }
