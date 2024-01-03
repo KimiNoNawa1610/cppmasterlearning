@@ -10,6 +10,7 @@
 #include <array> 
 #include "headers/Shape.h"
 #include "headers/Circle.h"
+#include "headers/Box.h"
 
 using namespace std;
 
@@ -410,7 +411,9 @@ int main() {
 
   cout<<"\n---OPERATOR OVERLOAD---\n"<<endl;
   
-
+  Box box(10,10,10);
+  ++box;
+  
   return 0;
 }
 

@@ -6,5 +6,5 @@ Box::Box(double l, double w, double h){
   this->height = h;
 }
 
-Box:~Box()=default;
+Box::~Box()=default;
 

@@ -21,11 +21,11 @@ public:
     height++;
     return *this;
   }
-  operator const char*(){
-    ostringstream boxStream;
-    boxStream<< "Box: "<<length<<", " <<width<<", " <<height;
-    return boxStream.str().c_str();
-  }
+  // operator std::string(){
+  //   ostringstream boxStream;
+  //   boxStream<< "Box: "<<length<<", " <<width<<", " <<height;
+  //   return boxStream.str();
+  // }
 };
 
-#endif
+#endif// BOX_H
