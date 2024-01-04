@@ -8,6 +8,9 @@
 #include <cmath>
 #include <vector>
 #include <array> 
+#include <algorithm>
+#include <fstream>
+#include <functional>
 #include "headers/Shape.h"
 #include "headers/Circle.h"
 #include "headers/Box.h"
@@ -63,6 +66,37 @@ struct sCircle: sShape{
     return PI * this->width * this->width;
   }
 };
+
+vector<int> GenerateRandVect(int numOfNums,int min, int max); // this is a function that generates a vector of random numbers
+
+double MultBy2(double num){
+  return num * 2;
+}
+
+// function as a parameter of another function
+double DoMath(function<double(double)> func,double num){ 
+  // syntax to pass a function as a parameter of other function
+  // function<returnType(parameterType)> funcName
+  return func(num);
+}
+
+#define Pi 3.14159
+// defind a macro
+// the macro will be replaced by the value 3.14159
+
+#define CIRCLE_AREA(r) (Pi*r*r)
+// macro function
+// the macro will be replaced by the value Pi*r*r
+
+// Template
+// template is different from function overloading
+// template is a way to create a function that can be used to do a same task with different data types (objects)
+// function overloading is a way to create a function that can do similar thing with different object
+
+template <typename T> // T is a generic type
+void Times2(T val){ // T is a template parameter
+  cout<< val<< " * 2 = "<< val*2<<endl;
+}
 
 int main() {
   cout << "Hello World!"<<endl;
@@ -413,8 +447,107 @@ int main() {
   
   Box box(10,10,10);
   ++box;
+
+  cout<<"\n---LAMBDA EXPRESSION---\n"<<endl;
+
+  // lambda expression is a way to create a function without defining a function
+  // lambda expression is a function without a name
+  // lambda expression is a function that can be passed as a parameter to another function
+  // make it easy to perform list operations in one line of code
+
+  vector<int> vecVals = GenerateRandVect(10,1,100);
+
+  // sort the vector
+  sort(vecVals.begin(),vecVals.end(),[](int x, int y){return x<y;});// sort the vector in ascending order 
+  // [] will indicate a lambda expression
+  // (x,y) will be the parameters of the lambda expression
+  // {return x<y;} will be the body of the lambda expression
+  // the body of the lambda expression will return true if x is less than y
+  // the body of the lambda expression will return false if x is greater than y
+  for (int i=0;i<vecVals.size();i++){
+    cout<<vecVals[i]<<endl;
+  }
+
+  vector<int> evenVecVals;
+  copy_if(vecVals.begin(),vecVals.end(),back_inserter(evenVecVals),[](int x){return (x%2==0);});
+  // copy_if() will copy the elements of the vector that meet the condition
+
+  int sum = 0;
+  for_each(vecVals.begin(),vecVals.end(),[&](int x){sum+=x;});
+  // for_each() will iterate through the vector and perform the operation on each element
+  // [&] will pass the variable by reference
+  // [=] will pass the variable by value
+  // [x] will pass the variable by value
+  cout<<sum<<endl;
+
+  cout<<"\n---FILE---\n"<<endl;
+
+  ofstream writeToFile;
+  ifstream readFromFile;
+  string txtToWrite = "";
+  string txtFromFile = "";
+
+  writeToFile.open("files/test.txt",ios_base::out |ios_base::trunc); 
+  // open the file in write mode
+  // app will append the text to the file
+  // ate wil overwrite the file
+  // trunc will delete the file and create a new one
+  // nocreate will not create the file if it does not exist
+
+  if(writeToFile.is_open()){
+    writeToFile<<"Begining of the file\n Hello World";
+    writeToFile.close(); // close the file
+  }
+
+  readFromFile.open("files/test.txt",ios_base::in); // open the file in read mode
+
+  if(readFromFile.is_open()){
+    while(readFromFile){
+      getline(readFromFile,txtFromFile);
+      cout<<txtFromFile<<endl;
+    }
+    readFromFile.close();
+  }
+
+  cout<<"\n---FUNCTION AS A PARAMETER---\n"<<endl;
+
+  auto times2 = MultBy2; // auto will determine the type of the variable
+  // MultBy2 is a function that takes an integer as a parameter and returns an integer
+
+  cout<< "5 * 2 = "<<times2(5)<<endl;
+  cout<< "6 * 2 = "<<DoMath(times2,6)<<endl; // DoMath() will call the function times2() and pass the value 5 to it
+
+  //store function inside vector
+
+  vector<function<double(double)>> funcs(2); // vector of function pointers
+  funcs[0] = MultBy2;
+  funcs[1] = times2;
+  cout<<funcs[0](5)<<endl; // call the function MultBy2() and pass the value 5 to it
+  cout<<funcs[1](2)<<endl; // call the function times2() and pass the value 2 to it
+  
+  cout<<"\n---MACRO---\n"<<endl;
+
+  cout<<CIRCLE_AREA(10)<<endl; // CIRCLE_AREA() will be replaced by the value of the macro
+
+  cout<<"\n---TEMPLATE FUNCTION---\n"<<endl;
+
+  Times2(2);
+  Times2(2.454);
+  Times2(-0.1231231);
+  
   
   return 0;
+}
+
+vector<int> GenerateRandVect(int numOfNums,int min, int max){
+  vector<int> vecValues;
+  srand(time(NULL));// seed the random number generator
+  int i = 0, randVal =0;
+  while (i<numOfNums){
+    randVal = rand()%(max-min+1)+min;
+    vecValues.push_back(randVal);
+    i++;}
+  return vecValues;
 }
 
 void ShowArea(Shape& shape){
