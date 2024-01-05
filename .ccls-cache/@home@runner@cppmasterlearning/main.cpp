@@ -11,6 +11,15 @@
 #include <algorithm>
 #include <fstream>
 #include <functional>
+#include <deque>
+#include <list>
+#include <forward_list>
+#include <iterator>
+#include <memory>
+#include <stdio.h>
+#include <thread>
+#include <chrono>
+#include <mutex>
 #include "headers/Shape.h"
 #include "headers/Circle.h"
 #include "headers/Box.h"
@@ -96,6 +105,55 @@ double DoMath(function<double(double)> func,double num){
 template <typename T> // T is a generic type
 void Times2(T val){ // T is a template parameter
   cout<< val<< " * 2 = "<< val*2<<endl;
+}
+
+template <typename T>
+T Add(T num1, T num2){ // T is a template parameter
+  // both num1 and num2 are of the same type
+  return num1 + num2;    
+}
+
+template <typename T>
+T Max(T num1, T num2){ // T is a template parameter
+  // both num1 and num2 are of the same type
+  return (num1<num2) ? num2:num1;  
+}
+
+// template class
+template <typename T, typename U>
+class Person{
+public:
+T height;
+U weight;
+static int numOfPeople;
+Person(T h, U w){
+  height = h;
+  weight = w;
+  numOfPeople++;
+}
+void GetPersonData(){
+  cout<<"Height: "<<height<<endl;
+  cout<<"Weight: "<<weight<<endl;
+}
+};
+
+// initialize static class member
+template<typename T, typename U> int Person<T,U>::numOfPeople;
+
+int GetRandom(int max){
+  srand(time(NULL)); // seed the random number generator
+  return rand() % max;
+}
+
+void ExecuteThread(int id){
+  auto nowTime = chrono::system_clock::now(); // get the current time
+  time_t sleepTime = chrono::system_clock::to_time_t(nowTime); // convert the time to a time_t
+  tm myLocalTime = *localtime(&sleepTime); // convert the time_t to a tm structure
+  cout<<"Thread "<<id<<" started at "<<myLocalTime.tm_hour<<":"<<myLocalTime.tm_min<<":"<<myLocalTime.tm_sec<<endl;
+  this_thread::sleep_for(chrono::seconds(GetRandom(3))); // sleep for a random amount of time
+  nowTime = chrono::system_clock::now(); // get the current time
+  sleepTime = chrono::system_clock::to_time_t(nowTime); // convert the time to
+  cout<<"Thread "<<id<<" ended at "<<myLocalTime.tm_hour<<":"<<myLocalTime.tm_min<<endl;
 }
 
 int main() {
@@ -530,6 +588,121 @@ int main() {
   cout<<CIRCLE_AREA(10)<<endl; // CIRCLE_AREA() will be replaced by the value of the macro
 
   cout<<"\n---TEMPLATE FUNCTION---\n"<<endl;
+
+  Times2(2);
+  Times2(2.454);
+  Times2(-0.1231231);
+
+  Person<double,int> Who(5.83,216); // we need to pass in the datatype we use for template class
+  Who.GetPersonData();
+  cout<< "Number of People: "<<Who.numOfPeople<<endl;
+
+  cout<<"\n---CONTAINER---\n"<<endl;
+
+  // container is a data structure that can hold multiple values
+  // container is a class that has a member variable that can hold multiple values
+  // container is a class that has a member function that can perform operations on the values of the container
+
+  deque<int> nums ={1,2,3,4};// dynamic array that can grow and shrink
+  nums.push_front(0);  // add a value to the front of the container
+  nums.push_back(5); // add a value to the end of the container
+  for(int i:nums){
+    cout<<i<<endl;
+  }
+
+  // iterator is used to iterate through the container
+  // it points to a specific element in the container
+
+  vector<int> nums2 = {1,2,3,4,5};
+  vector<int>::iterator itr;
+  for(itr=nums2.begin();itr<nums2.end();itr++){
+    cout<<*itr<<endl; // without the * the iterator will give the address of the element
+  }
+  // vector<int>::iterator itr2;
+  // advance(itr2,2); // will advance the iterator 2 steps
+  // cout<<*itr2<<endl; // will print the value of the element at the iterator
+  // auto itr3 = next(itr2,2); // will advance the iterator 2 steps and return the iterator
+  // cout<<*itr3<<endl; // will print the value of the element at the iterator
+  // auto itr4 = prev(itr3,2); // will go back 2 steps and return the iterator
+  // cout<<*itr4<<endl; // will print the value of the element at the iterator
+
+  cout<<"\n---SMART POINTER AND MALLOC---\n"<<endl;
+
+  // malloc 
+  int amtToStore;
+  cout<<"How Many Number Do You Want To Store: ";
+  cin>>amtToStore;
+  int* pNums;
+  pNums = (int*) malloc(amtToStore * sizeof(int)); // malloc() will allocate memory for the variable
+  if (pNums != NULL){
+    int i = 0;
+    while(i<amtToStore){
+      cout<<"Enter Number "<<i+1<<": ";
+      cin>>pNums[i];
+      i++;
+    }
+  }
+  cout<<"You Entered These Numbers"<<endl;
+  for(int i=0;i<amtToStore;i++){
+    cout<<pNums[i]<<endl;
+  }
+
+  delete pNums; // free the memory that was allocated by malloc()
+
+  // smart pointer is a pointer that is automatically freed when it goes out of scope
+  cout<<"How Many Number Do You Want To Store: ";
+  cin>>amtToStore;
+  unique_ptr<int[]> smpNums(new int[amtToStore]); // unique_ptr() will create a smart pointer
+  if (smpNums != NULL){
+    int i = 0;
+    while(i<amtToStore){
+      cout<<"Enter Number "<<i+1<<": ";
+      cin>>smpNums[i];
+      i++;
+    }
+  }
+  cout<<"You Entered These Numbers"<<endl;
+  for(int i=0;i<amtToStore;i++){
+    cout<<smpNums[i]<<endl;
+  }
+
+  cout<<"\n---THREADING---\n"<<endl;
+
+  // thread is a class that can be used to create a new thread
+  // thread is a class that can be used to run a function in a separate thread
+  // thread is a class that can be used to wait for a thread to finish
+  // thread is a class that can be used to join two threads
+
+  thread th1(ExecuteThread,1);
+  th1.join(); // wait for the thread to finish
+  thread th2(ExecuteThread,2);
+  th2.join(); // wait for the thread to finish
+  thread th3(ExecuteThread,3);
+  th3.join(); // wait for the thread to finish
+
+  cout<<"\n---SEQUENCE CONTAINER---\n"<<endl;
+  // sequence container is a container that can store a sequence of values
+  // deque is a class that has a member variable that can hold multiple values
+
+  deque<int> deq1;
+  deq1.push_back(5);
+  deq1.push_front(3);
+  cout<<"Size: " <<deq1.size()<<endl;// size() will return the size of the container
+  deq1.assign({12,11});// assign() will assign the values to the container
+  cout<<"Size: " <<deq1.size()<<endl;// same size as before
+  cout<<deq1.at(1)<<endl;// at() will return the value at the index
+  deque<int>::iterator it = deq1.begin()+1; // iterator is used to iterate through the container
+  deq1.insert(it,3);
+  int tempArr[5] = {1,23,52,45,43};
+  deq1.insert(deq1.end(),tempArr,tempArr+5);
+  deq1.erase(deq1.begin()); // erase() will erase the element at the index
+  deq1.erase(deq1.begin(),deq1.begin()+2); // erase() will erase the elements from the index to the index+1
+  
+  for(int i:deq1){
+    cout<<i<<endl;
+  }
+  deq1.pop_back();// pop_back() will remove the last element from the container
+  deq1.clear();// clear() will remove all the elements from the container
   
   return 0;
 }
